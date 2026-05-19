@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import '../models/doctor_model.dart';
+import 'doctor_info_bottom_sheet.dart';
 
 class DoctorCard extends StatelessWidget {
   // The doctor data to display
@@ -27,7 +28,17 @@ class DoctorCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          // Show Modal Bottom Sheet instead of navigating
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => DoctorInfoBottomSheet(
+              doctor: doctor,
+            ),
+            isScrollControlled: true,
+            useSafeArea: true,
+          );
+        },
         // Animated scale effect on tap
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),

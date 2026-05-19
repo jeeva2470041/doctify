@@ -3,7 +3,7 @@ import '../../widgets/custom_textfield.dart';
 import '../../widgets/custom_button.dart';
 import '../../data/dummy_data.dart';
 import '../../models/user_model.dart';
-import '../user/user_home_screen.dart';
+import '../user/user_home_layout.dart';
 
 class UserRegisterScreen extends StatefulWidget {
   const UserRegisterScreen({super.key});
@@ -47,7 +47,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Registration successful!'), backgroundColor: const Color(0xFF4CAF50), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UserHomeScreen(userName: newUser.name)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UserHomeLayout(user: newUser)));
         }
       });
     }

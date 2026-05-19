@@ -3,7 +3,7 @@ import '../../widgets/custom_textfield.dart';
 import '../../widgets/custom_button.dart';
 import '../../data/dummy_data.dart';
 import '../register/user_register_screen.dart';
-import '../user/user_home_screen.dart';
+import '../user/user_home_layout.dart';
 
 class UserLoginScreen extends StatefulWidget {
   const UserLoginScreen({super.key});
@@ -34,7 +34,7 @@ class _UserLoginScreenState extends State<UserLoginScreen> {
         );
         if (user.isNotEmpty && mounted) {
           setState(() => _isLoading = false);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UserHomeScreen(userName: user.first.name)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => UserHomeLayout(user: user.first)));
         } else if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(

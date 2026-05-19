@@ -3,7 +3,7 @@ import '../../widgets/custom_textfield.dart';
 import '../../widgets/custom_button.dart';
 import '../../data/dummy_data.dart';
 import '../register/doctor_register_screen.dart';
-import '../doctor/doctor_dashboard.dart';
+import '../doctor/doctor_dashboard_layout.dart';
 
 class DoctorLoginScreen extends StatefulWidget {
   const DoctorLoginScreen({super.key});
@@ -34,7 +34,7 @@ class _DoctorLoginScreenState extends State<DoctorLoginScreen> {
         );
         if (doctor.isNotEmpty && mounted) {
           setState(() => _isLoading = false);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DoctorDashboard(doctor: doctor.first)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DoctorDashboardLayout(doctor: doctor.first)));
         } else if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(

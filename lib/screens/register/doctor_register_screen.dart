@@ -3,7 +3,7 @@ import '../../widgets/custom_textfield.dart';
 import '../../widgets/custom_button.dart';
 import '../../data/dummy_data.dart';
 import '../../models/doctor_model.dart';
-import '../doctor/doctor_dashboard.dart';
+import '../doctor/doctor_dashboard_layout.dart';
 
 class DoctorRegisterScreen extends StatefulWidget {
   const DoctorRegisterScreen({super.key});
@@ -66,7 +66,7 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
         if (mounted) {
           setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Registration successful!'), backgroundColor: const Color(0xFF4CAF50), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DoctorDashboard(doctor: newDoctor)));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DoctorDashboardLayout(doctor: newDoctor)));
         }
       });
     }

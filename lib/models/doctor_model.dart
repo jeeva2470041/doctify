@@ -37,6 +37,9 @@ class DoctorModel {
   // URL for profile image (optional)
   final String profileImageUrl;
 
+  // Doctor's rating/points (0-5 stars)
+  final double rating;
+
   /// Constructor with named parameters
   /// Required fields are marked, optional ones have defaults
   DoctorModel({
@@ -50,6 +53,7 @@ class DoctorModel {
     required this.phoneNumber,
     this.isAvailable = true,
     this.profileImageUrl = '',
+    this.rating = 4.5,
   });
 
   /// Creates a copy of this doctor with some fields updated.
@@ -65,6 +69,7 @@ class DoctorModel {
     String? phoneNumber,
     bool? isAvailable,
     String? profileImageUrl,
+    double? rating,
   }) {
     return DoctorModel(
       id: id ?? this.id,
@@ -77,6 +82,7 @@ class DoctorModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       isAvailable: isAvailable ?? this.isAvailable,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      rating: rating ?? this.rating,
     );
   }
 }
