@@ -2,12 +2,14 @@
 /// Doctor Home Tab - Welcome & Quick Stats
 /// ============================================================
 /// Shows doctor welcome message, quick stats, and availability toggle.
+/// Uses AppColors — no hardcoded hex values.
 /// ============================================================
 
 import 'package:flutter/material.dart';
 import '../../models/doctor_model.dart';
 import '../../models/appointment_model.dart';
 import '../../data/dummy_data.dart';
+import '../../theme/app_colors.dart';
 
 class DoctorHomeTab extends StatefulWidget {
   final DoctorModel doctor;
@@ -32,14 +34,12 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
     _isAvailable = _doctor.isAvailable;
   }
 
-  /// Get appointments for this doctor
   List<AppointmentModel> _getDoctorAppointments() {
-    return appointmentBookings
+    return dummyAppointments
         .where((apt) => apt.doctorId == _doctor.id)
         .toList();
   }
 
-  /// Toggle availability
   void _toggleAvailability() {
     setState(() {
       _isAvailable = !_isAvailable;
@@ -48,19 +48,12 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          _isAvailable
-              ? '✓ You are now Online'
-              : '✓ You are now Offline',
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+          _isAvailable ? '✓ You are now Online' : '✓ You are now Offline',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
         backgroundColor:
-            _isAvailable ? const Color(0xFF4CAF50) : const Color(0xFF757575),
+            _isAvailable ? AppColors.available : AppColors.textSecondary,
         duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
       ),
     );
   }
@@ -74,214 +67,206 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
         appointments.where((apt) => apt.status == 'Approved').length;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0077B6),
-        elevation: 0,
-        title: const Text(
-          'Doctor Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+        title: const Text('Doctor Dashboard'),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ---- Welcome Header ----
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0077B6), Color(0xFF00B4D8)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ---- Welcome Card ----
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.25),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF0077B6).withOpacity(0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Welcome Back 👋',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          _doctor.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _doctor.specialization,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
+                  ),
+
+                  // Availability Toggle
+                  GestureDetector(
+                    onTap: _toggleAvailability,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _isAvailable
+                            ? AppColors.available
+                            : const Color(0xFF8E8E93),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.20),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            'Welcome Back',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          Icon(
+                            _isAvailable
+                                ? Icons.check_circle
+                                : Icons.power_settings_new,
+                            color: Colors.white,
+                            size: 26,
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 3),
                           Text(
-                            _doctor.name,
+                            _isAvailable ? 'Online' : 'Offline',
                             style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
                               color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _doctor.specialization,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.white70,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    // Availability Toggle
-                    GestureDetector(
-                      onTap: _toggleAvailability,
-                      child: Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _isAvailable
-                              ? const Color(0xFF4CAF50)
-                              : const Color(0xFF757575),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _isAvailable ? Icons.check_circle : Icons.power_settings_new,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _isAvailable ? 'Online' : 'Offline',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // ---- Quick Stats ----
-              const Text(
-                'Quick Stats',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Stats Grid
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'Total',
-                      count: appointments.length.toString(),
-                      icon: Icons.calendar_today,
-                      color: const Color(0xFF0077B6),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'Pending',
-                      count: pendingCount.toString(),
-                      icon: Icons.schedule,
-                      color: const Color(0xFFFFB800),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: 'Approved',
-                      count: approvedCount.toString(),
-                      icon: Icons.check_circle,
-                      color: const Color(0xFF4CAF50),
-                    ),
                   ),
                 ],
               ),
+            ),
 
-              const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-              // ---- Doctor Info Section ----
-              const Text(
-                'Profile Information',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A2E),
+            // ---- Quick Stats ----
+            Text(
+              'Quick Stats',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    title: 'Total',
+                    count: appointments.length.toString(),
+                    icon: Icons.calendar_today_rounded,
+                    color: AppColors.primary,
+                  ),
                 ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    title: 'Pending',
+                    count: pendingCount.toString(),
+                    icon: Icons.schedule_rounded,
+                    color: AppColors.pending,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildStatCard(
+                    title: 'Approved',
+                    count: approvedCount.toString(),
+                    icon: Icons.check_circle_rounded,
+                    color: AppColors.available,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // ---- Profile Information ----
+            Text(
+              'Profile Information',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
               ),
+            ),
 
-              const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-              _buildInfoCard(
-                icon: Icons.local_hospital_outlined,
-                label: 'Hospital',
-                value: _doctor.hospitalName,
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.cardBg,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 10),
-
-              _buildInfoCard(
-                icon: Icons.work_outline,
-                label: 'Experience',
-                value: _doctor.experience,
+              child: Column(
+                children: [
+                  _buildInfoRow(
+                      Icons.local_hospital_outlined, 'Hospital', _doctor.hospitalName, false),
+                  Divider(height: 1, color: AppColors.divider),
+                  _buildInfoRow(
+                      Icons.work_outline, 'Experience', _doctor.experience, false),
+                  Divider(height: 1, color: AppColors.divider),
+                  _buildInfoRow(
+                      Icons.phone_outlined, 'Contact', _doctor.phoneNumber, true),
+                ],
               ),
+            ),
 
-              const SizedBox(height: 10),
-
-              _buildInfoCard(
-                icon: Icons.phone_outlined,
-                label: 'Contact',
-                value: _doctor.phoneNumber,
-              ),
-
-              const SizedBox(height: 24),
-            ],
-          ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );
   }
 
-  /// Build stat card
   Widget _buildStatCard({
     required String title,
     required String count,
@@ -291,13 +276,13 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: color.withOpacity(0.10),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -308,26 +293,26 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8),
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: color),
           ),
           const SizedBox(height: 10),
           Text(
             count,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A2E),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             title,
             style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey.shade600,
+              fontSize: 12,
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -336,25 +321,22 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
     );
   }
 
-  /// Build info card
-  Widget _buildInfoCard({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F9FF),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF0077B6).withOpacity(0.2),
-        ),
-      ),
+  Widget _buildInfoRow(
+      IconData icon, String label, String value, bool isLast) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: const Color(0xFF0077B6)),
-          const SizedBox(width: 12),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBg,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, size: 17, color: AppColors.primary),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,18 +344,18 @@ class _DoctorHomeTabState extends State<DoctorHomeTab> {
                 Text(
                   label,
                   style: TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey.shade600,
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

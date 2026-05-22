@@ -9,7 +9,6 @@ class DoctorDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
       body: CustomScrollView(
         slivers: [
           // Gradient App Bar with doctor info
@@ -69,11 +68,11 @@ class DoctorDetailsScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Info Cards
-                _buildInfoCard(Icons.medical_services_outlined, 'Specialization', doctor.specialization),
-                _buildInfoCard(Icons.work_outline, 'Experience', doctor.experience),
-                _buildInfoCard(Icons.local_hospital_outlined, 'Hospital', doctor.hospitalName),
-                _buildInfoCard(Icons.phone_outlined, 'Phone', doctor.phoneNumber),
-                _buildInfoCard(Icons.email_outlined, 'Email', doctor.email),
+                _buildInfoCard(Icons.medical_services_outlined, 'Specialization', doctor.specialization, context),
+                _buildInfoCard(Icons.work_outline, 'Experience', doctor.experience, context),
+                _buildInfoCard(Icons.local_hospital_outlined, 'Hospital', doctor.hospitalName, context),
+                _buildInfoCard(Icons.phone_outlined, 'Phone', doctor.phoneNumber, context),
+                _buildInfoCard(Icons.email_outlined, 'Email', doctor.email, context),
 
                 const SizedBox(height: 20),
 
@@ -103,21 +102,21 @@ class DoctorDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String label, String value) {
+  Widget _buildInfoCard(IconData icon, String label, String value, BuildContext context) {
     return Container(
       width: double.infinity, margin: const EdgeInsets.only(bottom: 12), padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))]),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(14), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))]),
       child: Row(children: [
         Container(
           width: 44, height: 44,
-          decoration: BoxDecoration(color: const Color(0xFFE8F4FD), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, color: const Color(0xFF0077B6), size: 22),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
         ),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
           const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
+          Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface)),
         ])),
       ]),
     );

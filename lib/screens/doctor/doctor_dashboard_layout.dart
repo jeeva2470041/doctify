@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import '../../models/doctor_model.dart';
+import '../../theme/app_colors.dart';
 import 'doctor_home_tab.dart';
 import 'doctor_appointments_tab.dart';
 import 'doctor_profile_tab.dart';
@@ -24,10 +25,7 @@ class DoctorDashboardLayout extends StatefulWidget {
 }
 
 class _DoctorDashboardLayoutState extends State<DoctorDashboardLayout> {
-  // Currently selected tab index
   int _selectedIndex = 0;
-
-  // Late initialization to allow state updates
   late DoctorModel _doctor;
 
   @override
@@ -36,14 +34,12 @@ class _DoctorDashboardLayoutState extends State<DoctorDashboardLayout> {
     _doctor = widget.doctor;
   }
 
-  /// Handle bottom navigation bar tab selection
   void _onTabSelected(int index) {
     setState(() {
       _selectedIndex = index;
     });
   }
 
-  /// Update doctor profile
   void _updateDoctorProfile(DoctorModel updatedDoctor) {
     setState(() {
       _doctor = updatedDoctor;
@@ -52,7 +48,6 @@ class _DoctorDashboardLayoutState extends State<DoctorDashboardLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // Define the screens for each tab
     final List<Widget> screens = [
       DoctorHomeTab(doctor: _doctor),
       DoctorAppointmentsTab(doctor: _doctor),
@@ -64,28 +59,60 @@ class _DoctorDashboardLayoutState extends State<DoctorDashboardLayout> {
 
     return Scaffold(
       body: screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onTabSelected,
-        elevation: 8,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF0077B6),
-        unselectedItemColor: Colors.grey.shade400,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Appointments',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
+      bottomNavigationBar: _buildBottomNavBar(),
+    );
+  }
+
+  Widget _buildBottomNavBar() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).bottomNavigationBarTheme.backgroundColor ?? Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 16,
+            offset: const Offset(0, -2),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onTabSelected,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor ?? Theme.of(context).colorScheme.surface,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: const Color(0xFF8E8E93),
+          selectedFontSize: 12,
+          unselectedFontSize: 11,
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home_rounded),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month_outlined),
+              activeIcon: Icon(Icons.calendar_month_rounded),
+              label: 'Appointments',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline_rounded),
+              activeIcon: Icon(Icons.person_rounded),
+              label: 'Profile',
+            ),
+          ],
+        ),
       ),
     );
   }

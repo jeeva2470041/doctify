@@ -30,6 +30,12 @@ class AppointmentModel {
   // Doctor's ID (for linking to doctor)
   final String doctorId;
 
+  // Doctor's specialization
+  final String doctorSpecialization;
+
+  // Consultation duration (e.g. "30 Mins")
+  final String duration;
+
   // Current status of appointment
   // Possible values: 'Pending', 'Approved', 'Rejected'
   final String status;
@@ -44,10 +50,12 @@ class AppointmentModel {
     required this.contactNumber,
     required this.doctorName,
     required this.doctorId,
+    this.doctorSpecialization = 'General Physician',
+    this.duration = '30 Mins',
     this.status = 'Pending',
   });
 
-  /// Creates a copy with updated status
+  /// Creates a copy with updated fields
   AppointmentModel copyWith({
     String? id,
     String? patientName,
@@ -57,6 +65,8 @@ class AppointmentModel {
     String? contactNumber,
     String? doctorName,
     String? doctorId,
+    String? doctorSpecialization,
+    String? duration,
     String? status,
   }) {
     return AppointmentModel(
@@ -68,7 +78,43 @@ class AppointmentModel {
       contactNumber: contactNumber ?? this.contactNumber,
       doctorName: doctorName ?? this.doctorName,
       doctorId: doctorId ?? this.doctorId,
+      doctorSpecialization: doctorSpecialization ?? this.doctorSpecialization,
+      duration: duration ?? this.duration,
       status: status ?? this.status,
+    );
+  }
+
+  /// Convert AppointmentModel to a map (for Firebase)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'patientName': patientName,
+      'age': age,
+      'symptoms': symptoms,
+      'appointmentDate': appointmentDate,
+      'contactNumber': contactNumber,
+      'doctorName': doctorName,
+      'doctorId': doctorId,
+      'doctorSpecialization': doctorSpecialization,
+      'duration': duration,
+      'status': status,
+    };
+  }
+
+  /// Create AppointmentModel from a map (from Firebase)
+  factory AppointmentModel.fromMap(Map<String, dynamic> map) {
+    return AppointmentModel(
+      id: map['id'] ?? '',
+      patientName: map['patientName'] ?? '',
+      age: map['age'] ?? 0,
+      symptoms: map['symptoms'] ?? '',
+      appointmentDate: map['appointmentDate'] ?? '',
+      contactNumber: map['contactNumber'] ?? '',
+      doctorName: map['doctorName'] ?? '',
+      doctorId: map['doctorId'] ?? '',
+      doctorSpecialization: map['doctorSpecialization'] ?? 'General Physician',
+      duration: map['duration'] ?? '30 Mins',
+      status: map['status'] ?? 'Pending',
     );
   }
 }

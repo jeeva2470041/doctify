@@ -1,9 +1,26 @@
 /// ============================================================
-/// Dummy Data - Pre-loaded Doctor Information
+/// DEPRECATED - Dummy Data (No longer used)
 /// ============================================================
-/// This file contains sample doctor data for testing the app.
-/// In a real app, this data would come from a database or API.
-/// We use local lists to keep things beginner-friendly.
+/// This file is DEPRECATED and should not be used anymore.
+/// All data should now come from Firebase.
+/// 
+/// Please use the FirebaseService class instead:
+/// - lib/services/firebase_service.dart
+/// 
+/// For setup instructions, see:
+/// - FIREBASE_SETUP.md
+/// ============================================================
+/// 
+/// To migrate:
+/// 1. Remove imports of dummy_data.dart from your screens
+/// 2. Import FirebaseService instead
+/// 3. Use FirebaseService methods to fetch data from Firestore
+/// 
+/// Example:
+/// Instead of: List<DoctorModel> doctors = dummyDoctors;
+/// Use:
+///   final firebaseService = FirebaseService();
+///   List<DoctorModel> doctors = await firebaseService.getAllDoctors();
 /// ============================================================
 
 import '../models/doctor_model.dart';
@@ -11,8 +28,6 @@ import '../models/user_model.dart';
 import '../models/appointment_model.dart';
 import '../models/notification_model.dart';
 
-/// List of dummy doctors - this acts as our local "database"
-/// New doctors registered through the app will be added here
 List<DoctorModel> dummyDoctors = [
   DoctorModel(
     id: '1',
@@ -94,19 +109,17 @@ List<DoctorModel> dummyDoctors = [
   ),
 ];
 
-/// List of registered users - new users will be added here
 List<UserModel> registeredUsers = [
   UserModel(
     id: '1',
     name: 'Test User',
     email: 'user@test.com',
     password: '123456',
+    favoriteDoctorIds: [],
   ),
 ];
 
-/// List of appointment bookings - new bookings will be added here
-/// This acts as our local "appointment database"
-List<AppointmentModel> appointmentBookings = [
+List<AppointmentModel> dummyAppointments = [
   AppointmentModel(
     id: '1',
     patientName: 'Rajesh Kumar',
@@ -116,6 +129,8 @@ List<AppointmentModel> appointmentBookings = [
     contactNumber: '+91 98765 11111',
     doctorName: 'Dr. Priya Sharma',
     doctorId: '1',
+    doctorSpecialization: 'Cardiologist',
+    duration: '30 Mins',
     status: 'Pending',
   ),
   AppointmentModel(
@@ -127,6 +142,8 @@ List<AppointmentModel> appointmentBookings = [
     contactNumber: '+91 98765 22222',
     doctorName: 'Dr. Arjun Mehta',
     doctorId: '2',
+    doctorSpecialization: 'Neurologist',
+    duration: '45 Mins',
     status: 'Approved',
   ),
   AppointmentModel(
@@ -138,6 +155,8 @@ List<AppointmentModel> appointmentBookings = [
     contactNumber: '+91 98765 33333',
     doctorName: 'Dr. Sneha Patel',
     doctorId: '3',
+    doctorSpecialization: 'Dermatologist',
+    duration: '15 Mins',
     status: 'Pending',
   ),
   AppointmentModel(
@@ -149,11 +168,12 @@ List<AppointmentModel> appointmentBookings = [
     contactNumber: '+91 98765 44444',
     doctorName: 'Dr. Rahul Verma',
     doctorId: '4',
+    doctorSpecialization: 'Orthopedic Surgeon',
+    duration: '30 Mins',
     status: 'Rejected',
   ),
 ];
 
-/// List of notifications - sample notifications for testing
 List<NotificationModel> userNotifications = [
   NotificationModel(
     id: '1',

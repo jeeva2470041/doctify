@@ -1,12 +1,13 @@
 /// ============================================================
 /// Custom TextField Widget - Reusable Input Field
 /// ============================================================
-/// A beautifully styled text field that can be reused across
-/// all login, registration, and form screens.
-/// Features: rounded corners, prefix icon, validation support.
+/// A premium styled text field with white fill, rounded corners,
+/// primary focused border, and AppColors theming.
+/// No hardcoded hex values — uses AppColors throughout.
 /// ============================================================
 
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   // Controller to read/write the text value
@@ -33,6 +34,9 @@ class CustomTextField extends StatelessWidget {
   // Maximum number of lines
   final int maxLines;
 
+  // Label text (optional)
+  final String? labelText;
+
   const CustomTextField({
     super.key,
     required this.controller,
@@ -43,85 +47,95 @@ class CustomTextField extends StatelessWidget {
     this.validator,
     this.suffixIcon,
     this.maxLines = 1,
+    this.labelText,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // Add vertical spacing between text fields
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 7.0),
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
         maxLines: maxLines,
         validator: validator,
-
-        // Style the input text
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
-          color: Color(0xFF1A1A2E),
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w500,
         ),
-
-        // Decoration for the text field appearance
         decoration: InputDecoration(
           hintText: hintText,
+          labelText: labelText,
           hintStyle: TextStyle(
-            color: Colors.grey.shade400,
+            color: AppColors.textHint,
             fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          labelStyle: TextStyle(
+            color: AppColors.textSecondary,
+            fontSize: 14,
+          ),
+          floatingLabelStyle: const TextStyle(
+            color: AppColors.primary,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
           ),
 
           // Icon at the beginning of the field
           prefixIcon: Icon(
             prefixIcon,
-            color: const Color(0xFF0077B6),
-            size: 22,
+            color: AppColors.primary,
+            size: 20,
           ),
 
           // Optional suffix icon
           suffixIcon: suffixIcon,
 
-          // Background fill color
+          // Dynamic background fill
           filled: true,
-          fillColor: const Color(0xFFF0F4F8),
+          fillColor: AppColors.cardBg,
 
-          // Border styling - rounded corners
+          // Default border
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: AppColors.border, width: 1),
           ),
 
-          // When the field is focused
+          // Enabled (not focused) border
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: AppColors.border, width: 1),
+          ),
+
+          // Focused border — primary blue
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: Color(0xFF0077B6),
-              width: 1.5,
-            ),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
 
-          // When there's a validation error
+          // Validation error border
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: Colors.redAccent,
-              width: 1.5,
-            ),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.busy, width: 1.5),
           ),
 
-          // When focused with an error
+          // Focused with error border
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(
-              color: Colors.redAccent,
-              width: 1.5,
-            ),
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: AppColors.busy, width: 1.5),
           ),
 
-          // Content padding inside the field
+          // Content padding
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
-            vertical: 16,
+            vertical: 14,
+          ),
+
+          errorStyle: const TextStyle(
+            color: AppColors.busy,
+            fontSize: 12,
           ),
         ),
       ),

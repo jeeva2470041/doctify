@@ -1,13 +1,14 @@
 /// ============================================================
 /// Doctor Card Widget - Reusable Doctor List Item
 /// ============================================================
-/// Displays a doctor's summary in a beautiful card format.
-/// Used in the doctor listing screens (User Home & Home Screen).
-/// Features: avatar, name, specialization, availability badge.
+/// Displays a doctor's summary in a premium card format.
+/// Uses AppColors — no hardcoded hex values.
+/// Features: avatar, name, specialization, availability badge, soft shadow.
 /// ============================================================
 
 import 'package:flutter/material.dart';
 import '../models/doctor_model.dart';
+import '../theme/app_colors.dart';
 import 'doctor_info_bottom_sheet.dart';
 
 class DoctorCard extends StatelessWidget {
@@ -27,114 +28,139 @@ class DoctorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: GestureDetector(
-        onTap: () {
-          // Show Modal Bottom Sheet instead of navigating
-          showModalBottomSheet(
-            context: context,
-            builder: (context) => DoctorInfoBottomSheet(
-              doctor: doctor,
-            ),
-            isScrollControlled: true,
-            useSafeArea: true,
-          );
-        },
-        // Animated scale effect on tap
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          child: Card(
-            // Card elevation for shadow
-            elevation: 3,
-            shadowColor: const Color(0xFF0077B6).withOpacity(0.15),
-
-            // Rounded corners
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                // Subtle gradient background
-                gradient: const LinearGradient(
-                  colors: [Colors.white, Color(0xFFF8FBFF)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (context) => DoctorInfoBottomSheet(
+                doctor: doctor,
+                isFavorite: false,
+                onToggleFavorite: (_) {},
               ),
-              child: Row(
-                children: [
-                  // ---- Doctor Avatar ----
-                  _buildAvatar(),
+              isScrollControlled: true,
+              useSafeArea: true,
+              backgroundColor: Colors.transparent,
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.07),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // ---- Doctor Avatar ----
+                _buildAvatar(),
 
-                  const SizedBox(width: 16),
+                const SizedBox(width: 14),
 
-                  // ---- Doctor Info ----
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Doctor Name
-                        Text(
-                          doctor.name,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1A1A2E),
-                          ),
+                // ---- Doctor Info ----
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Doctor Name
+                      Text(
+                        doctor.name,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
 
-                        const SizedBox(height: 4),
+                      const SizedBox(height: 4),
 
-                        // Specialization with icon
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.medical_services_outlined,
-                              size: 15,
-                              color: Colors.grey.shade500,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
+                      // Specialization with icon
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.medical_services_outlined,
+                            size: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
                               doctor.specialization,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.grey.shade600,
+                                color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w500,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
 
-                        const SizedBox(height: 4),
+                      const SizedBox(height: 4),
 
-                        // Experience
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.work_outline,
-                              size: 15,
-                              color: Colors.grey.shade500,
+                      // Experience + Rating row
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 13,
+                            color: Color(0xFFFF9500),
+                          ),
+                          const SizedBox(width: 2),
+                          Text(
+                            doctor.rating.toString(),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.work_outline,
+                            size: 12,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 3),
+                          Flexible(
+                            child: Text(
                               doctor.experience,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade500,
+                                color: AppColors.textSecondary,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
+                ),
 
-                  // ---- Availability Badge ----
-                  _buildAvailabilityBadge(),
-                ],
-              ),
+                const SizedBox(width: 8),
+
+                // ---- Availability Badge ----
+                _buildAvailabilityBadge(),
+              ],
             ),
           ),
         ),
@@ -144,7 +170,6 @@ class DoctorCard extends StatelessWidget {
 
   /// Builds the circular avatar with doctor's initial
   Widget _buildAvatar() {
-    // Get first letter of the doctor's name (skip "Dr. ")
     final String initial = doctor.name.replaceFirst('Dr. ', '').isNotEmpty
         ? doctor.name.replaceFirst('Dr. ', '')[0].toUpperCase()
         : 'D';
@@ -153,18 +178,13 @@ class DoctorCard extends StatelessWidget {
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        // Gradient circle for the avatar
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0077B6), Color(0xFF00B4D8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0077B6).withOpacity(0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: AppColors.primary.withOpacity(0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -183,44 +203,36 @@ class DoctorCard extends StatelessWidget {
 
   /// Builds the availability status badge
   Widget _buildAvailabilityBadge() {
+    final isAvail = doctor.isAvailable;
+    final color = isAvail ? AppColors.available : AppColors.busy;
+    final bgColor = isAvail ? AppColors.availableBg : AppColors.busyBg;
+    final label = isAvail ? 'Available' : 'Busy';
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        // Green for available, red for unavailable
-        color: doctor.isAvailable
-            ? const Color(0xFFE8F5E9)
-            : const Color(0xFFFFEBEE),
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: doctor.isAvailable
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFE53935),
-          width: 0.5,
-        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Status dot
+          // Pulsing dot
           Container(
             width: 7,
             height: 7,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: doctor.isAvailable
-                  ? const Color(0xFF4CAF50)
-                  : const Color(0xFFE53935),
+              color: color,
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 5),
           Text(
-            doctor.isAvailable ? 'Available' : 'Busy',
+            label,
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: doctor.isAvailable
-                  ? const Color(0xFF2E7D32)
-                  : const Color(0xFFC62828),
+              color: color,
             ),
           ),
         ],

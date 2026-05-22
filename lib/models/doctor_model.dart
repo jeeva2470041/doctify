@@ -16,7 +16,7 @@ class DoctorModel {
   // Doctor's email address
   final String email;
 
-  // Doctor's password (for login)
+  // Doctor's password (for login) - Not stored in Firebase for security
   final String password;
 
   // Medical specialization (e.g., Cardiologist, Neurologist)
@@ -83,6 +83,39 @@ class DoctorModel {
       isAvailable: isAvailable ?? this.isAvailable,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
       rating: rating ?? this.rating,
+    );
+  }
+
+  /// Convert DoctorModel to a map (for Firebase)
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'specialization': specialization,
+      'experience': experience,
+      'hospitalName': hospitalName,
+      'phoneNumber': phoneNumber,
+      'isAvailable': isAvailable,
+      'profileImageUrl': profileImageUrl,
+      'rating': rating,
+    };
+  }
+
+  /// Create DoctorModel from a map (from Firebase)
+  factory DoctorModel.fromMap(Map<String, dynamic> map) {
+    return DoctorModel(
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+      password: '', // Password is not retrieved from Firebase
+      specialization: map['specialization'] ?? '',
+      experience: map['experience'] ?? '',
+      hospitalName: map['hospitalName'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
+      isAvailable: map['isAvailable'] ?? true,
+      profileImageUrl: map['profileImageUrl'] ?? '',
+      rating: (map['rating'] ?? 4.5).toDouble(),
     );
   }
 }

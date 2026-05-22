@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "66815410352",
+    "project_id": "campus-share-6accf",
+    "storage_bucket": "campus-share-6accf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66815410352:android:40afd91897b1a0cb52fb75",
+        "android_client_info": {
+          "package_name": "com.example.doctorapps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "66815410352-lnegliliuojiiplm7n77op6af16624n9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG6HywB1d98nyN5HbO3pqVVC36_vh8LJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "66815410352-lnegliliuojiiplm7n77op6af16624n9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "66815410352-g06b9io8j81qrm96q4aepigqvm60auvm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sharingplatform.sharingplatform"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

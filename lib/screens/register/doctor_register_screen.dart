@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_textfield.dart';
+import '../../widgets/custom_dropdown_field.dart';
 import '../../widgets/custom_button.dart';
 import '../../data/dummy_data.dart';
 import '../../models/doctor_model.dart';
+import '../../theme/app_colors.dart';
 import '../doctor/doctor_dashboard_layout.dart';
 
 class DoctorRegisterScreen extends StatefulWidget {
@@ -25,6 +27,40 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
+  final List<String> _specializations = [
+    'Cardiologist',
+    'Neurologist',
+    'Dermatologist',
+    'Orthopedic Surgeon',
+    'Pediatrician',
+    'General Physician',
+    'Gastroenterologist',
+    'Ophthalmologist',
+  ];
+
+  final List<String> _experiences = [
+    '1 Year',
+    '2 Years',
+    '3 Years',
+    '4 Years',
+    '5 Years',
+    '6 Years',
+    '7 Years',
+    '8 Years',
+    '9 Years',
+    '10 Years',
+    '11 Years',
+    '12 Years',
+    '13 Years',
+    '14 Years',
+    '15 Years',
+    '16 Years',
+    '17 Years',
+    '18 Years',
+    '19 Years',
+    '20+ Years',
+  ];
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -42,14 +78,21 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
       Future.delayed(const Duration(milliseconds: 800), () {
-        // Check if email already exists
-        final exists = dummyDoctors.any((d) => d.email == _emailController.text.trim());
+        final exists = dummyDoctors
+            .any((d) => d.email == _emailController.text.trim());
         if (exists && mounted) {
           setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Email already registered'), backgroundColor: Colors.redAccent, behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Email already registered'),
+              backgroundColor: AppColors.busy,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          );
           return;
         }
-        // Create new doctor and add to list
         final newDoctor = DoctorModel(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           name: 'Dr. ${_nameController.text.trim()}',
@@ -65,8 +108,20 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
         dummyDoctors.add(newDoctor);
         if (mounted) {
           setState(() => _isLoading = false);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Registration successful!'), backgroundColor: const Color(0xFF4CAF50), behavior: SnackBarBehavior.floating, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))));
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => DoctorDashboardLayout(doctor: newDoctor)));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Registration successful!'),
+              backgroundColor: AppColors.available,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (_) => DoctorDashboardLayout(doctor: newDoctor)),
+          );
         }
       });
     }
@@ -87,52 +142,240 @@ class _DoctorRegisterScreenState extends State<DoctorRegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
-      body: Container(
-        width: double.infinity, height: double.infinity,
-        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFE8F4FD), Colors.white])),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Form(
-              key: _formKey,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const SizedBox(height: 20),
-                IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back_ios_rounded), color: const Color(0xFF1A1A2E)),
-                const SizedBox(height: 10),
-                const Center(child: Text('Doctor Registration', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E)))),
-                const SizedBox(height: 6),
-                Center(child: Text('Create your doctor profile', style: TextStyle(fontSize: 14, color: Colors.grey.shade500))),
-                const SizedBox(height: 30),
-                CustomTextField(controller: _nameController, hintText: 'Full Name', prefixIcon: Icons.person_outline, validator: (v) => (v == null || v.isEmpty) ? 'Please enter your name' : null),
-                CustomTextField(controller: _emailController, hintText: 'Email Address', prefixIcon: Icons.email_outlined, keyboardType: TextInputType.emailAddress, validator: (v) { if (v == null || v.isEmpty) return 'Please enter email'; if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) return 'Invalid email'; return null; }),
-                CustomTextField(controller: _passwordController, hintText: 'Password', prefixIcon: Icons.lock_outline, obscureText: _obscurePassword, suffixIcon: IconButton(icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: Colors.grey.shade400, size: 20), onPressed: () => setState(() => _obscurePassword = !_obscurePassword)), validator: (v) { if (v == null || v.isEmpty) return 'Please enter password'; if (v.length < 6) return 'Min 6 characters'; return null; }),
-                CustomTextField(controller: _specializationController, hintText: 'Specialization', prefixIcon: Icons.medical_services_outlined, validator: (v) => (v == null || v.isEmpty) ? 'Please enter specialization' : null),
-                CustomTextField(controller: _experienceController, hintText: 'Experience (e.g., 5 Years)', prefixIcon: Icons.work_outline, validator: (v) => (v == null || v.isEmpty) ? 'Please enter experience' : null),
-                CustomTextField(controller: _hospitalController, hintText: 'Hospital Name', prefixIcon: Icons.local_hospital_outlined, validator: (v) => (v == null || v.isEmpty) ? 'Please enter hospital name' : null),
-                CustomTextField(controller: _phoneController, hintText: 'Phone Number', prefixIcon: Icons.phone_outlined, keyboardType: TextInputType.phone, validator: (v) => (v == null || v.isEmpty) ? 'Please enter phone number' : null),
-                CustomTextField(controller: _imageUrlController, hintText: 'Profile Image URL (optional)', prefixIcon: Icons.image_outlined),
-                const SizedBox(height: 8),
-                // Availability Toggle
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFF0F4F8), borderRadius: BorderRadius.circular(14)),
-                  child: SwitchListTile(
-                    title: const Text('Available for Consultation', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                    value: _isAvailable,
-                    onChanged: (v) => setState(() => _isAvailable = v),
-                    activeColor: const Color(0xFF0077B6),
-                    contentPadding: EdgeInsets.zero,
-                  ),
+      body: Column(
+        children: [
+          // ---- Gradient Header ----
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: AppColors.primaryGradientV,
+            ),
+            child: SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.20),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_rounded,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.20),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(Icons.medical_services_rounded,
+                              size: 26, color: Colors.white),
+                        ),
+                        const SizedBox(width: 14),
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Doctor Registration',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'Create your doctor profile',
+                              style: TextStyle(
+                                  fontSize: 13, color: Colors.white70),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                CustomButton(text: 'Register', onPressed: _handleRegister, isLoading: _isLoading, icon: Icons.app_registration_rounded),
-                CustomButton(text: 'Reset', onPressed: _handleReset, isOutlined: true, icon: Icons.refresh_rounded),
-                const SizedBox(height: 30),
-              ]),
+              ),
             ),
           ),
-        ),
+
+          // ---- Form Section ----
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      controller: _nameController,
+                      hintText: 'Full Name',
+                      prefixIcon: Icons.person_outline,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Please enter your name'
+                          : null,
+                    ),
+                    CustomTextField(
+                      controller: _emailController,
+                      hintText: 'Email Address',
+                      prefixIcon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Please enter email';
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(v)) return 'Invalid email';
+                        return null;
+                      },
+                    ),
+                    CustomTextField(
+                      controller: _passwordController,
+                      hintText: 'Password',
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: _obscurePassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color: AppColors.textHint,
+                          size: 20,
+                        ),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
+                      ),
+                      validator: (v) {
+                        if (v == null || v.isEmpty)
+                          return 'Please enter password';
+                        if (v.length < 6) return 'Min 6 characters';
+                        return null;
+                      },
+                    ),
+                    CustomDropdownField(
+                      value: _specializationController.text,
+                      hintText: 'Specialization',
+                      prefixIcon: Icons.medical_services_outlined,
+                      items: _specializations,
+                      onChanged: (val) {
+                        setState(() {
+                          _specializationController.text = val ?? '';
+                        });
+                      },
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Please select specialization'
+                          : null,
+                    ),
+                    CustomDropdownField(
+                      value: _experienceController.text,
+                      hintText: 'Experience',
+                      prefixIcon: Icons.work_outline,
+                      items: _experiences,
+                      onChanged: (val) {
+                        setState(() {
+                          _experienceController.text = val ?? '';
+                        });
+                      },
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Please select experience'
+                          : null,
+                    ),
+                    CustomTextField(
+                      controller: _hospitalController,
+                      hintText: 'Hospital Name',
+                      prefixIcon: Icons.local_hospital_outlined,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Please enter hospital name'
+                          : null,
+                    ),
+                    CustomTextField(
+                      controller: _phoneController,
+                      hintText: 'Phone Number',
+                      prefixIcon: Icons.phone_outlined,
+                      keyboardType: TextInputType.phone,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'Please enter phone number'
+                          : null,
+                    ),
+                    CustomTextField(
+                      controller: _imageUrlController,
+                      hintText: 'Profile Image URL (optional)',
+                      prefixIcon: Icons.image_outlined,
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // ---- Availability Toggle ----
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.cardBg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: SwitchListTile(
+                        title: Text(
+                          'Available for Consultation',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        subtitle: Text(
+                          _isAvailable
+                              ? 'Patients can book appointments'
+                              : 'Not accepting bookings',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _isAvailable
+                                ? AppColors.available
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                        value: _isAvailable,
+                        onChanged: (v) => setState(() => _isAvailable = v),
+                        activeColor: AppColors.available,
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    CustomButton(
+                      text: 'Register',
+                      onPressed: _handleRegister,
+                      isLoading: _isLoading,
+                      icon: Icons.app_registration_rounded,
+                    ),
+                    CustomButton(
+                      text: 'Reset',
+                      onPressed: _handleReset,
+                      isOutlined: true,
+                      icon: Icons.refresh_rounded,
+                    ),
+
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

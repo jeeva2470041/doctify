@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/doctor_model.dart';
 import '../../models/appointment_model.dart';
 import '../../data/dummy_data.dart';
+import '../../theme/app_colors.dart';
 import '../landing_page.dart';
 import 'doctor_edit_screen.dart';
 
@@ -24,18 +25,18 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
 
   /// Get appointments for this doctor
   List<AppointmentModel> _getDoctorAppointments() {
-    return appointmentBookings
+    return dummyAppointments
         .where((apt) => apt.doctorId == _doctor.id)
         .toList();
   }
 
   /// Update appointment status
   void _updateAppointmentStatus(String appointmentId, String newStatus) {
-    final index = appointmentBookings
+    final index = dummyAppointments
         .indexWhere((apt) => apt.id == appointmentId);
     if (index != -1) {
-      appointmentBookings[index] =
-          appointmentBookings[index].copyWith(status: newStatus);
+      dummyAppointments[index] =
+          dummyAppointments[index].copyWith(status: newStatus);
       setState(() {});
 
       // Show confirmation
@@ -49,8 +50,8 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             ),
           ),
           backgroundColor: newStatus == 'Approved'
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFE53935),
+              ? AppColors.available
+              : AppColors.busy,
           duration: const Duration(seconds: 2),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),
@@ -73,7 +74,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
               Navigator.pop(ctx);
               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const LandingPage()), (route) => false);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0077B6), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
             child: const Text('Logout', style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -84,11 +85,11 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Dashboard', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         centerTitle: true,
-        backgroundColor: const Color(0xFF0077B6),
+        backgroundColor: AppColors.primary,
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
@@ -102,7 +103,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
             decoration: const BoxDecoration(
-              color: Color(0xFF0077B6),
+              gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.only(bottomLeft: Radius.circular(24), bottomRight: Radius.circular(24)),
             ),
             child: Column(children: [
@@ -129,7 +130,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                   border: Border.all(color: Colors.white.withOpacity(0.3)),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: _doctor.isAvailable ? const Color(0xFF4CAF50) : const Color(0xFFE53935))),
+                  Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: _doctor.isAvailable ? AppColors.available : AppColors.busy)),
                   const SizedBox(width: 6),
                   Text(_doctor.isAvailable ? 'Available' : 'Unavailable', style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
                 ]),
@@ -147,14 +148,14 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 icon: Icons.person_rounded,
                 title: 'View Profile',
                 subtitle: 'See your complete profile details',
-                color: const Color(0xFF0077B6),
+                color: AppColors.primary,
                 onTap: () => _showProfileBottomSheet(),
               ),
               _buildMenuCard(
                 icon: Icons.edit_rounded,
                 title: 'Edit Details',
                 subtitle: 'Update your profile information',
-                color: const Color(0xFF00B4D8),
+                color: AppColors.primaryLight,
                 onTap: () async {
                   final updatedDoctor = await Navigator.push<DoctorModel>(context, MaterialPageRoute(builder: (_) => DoctorEditScreen(doctor: _doctor)));
                   if (updatedDoctor != null) {
@@ -179,18 +180,18 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Appointment Requests',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A2E),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0077B6).withOpacity(0.1),
+                        color: AppColors.primaryBg,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -198,7 +199,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0077B6),
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -221,14 +222,14 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       onTap: onTap,
       child: Container(
         width: double.infinity, margin: const EdgeInsets.only(bottom: 14), padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: color.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))]),
+        decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: color.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))]),
         child: Row(children: [
           Container(width: 52, height: 52, decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(14)), child: Icon(icon, color: color, size: 26)),
           const SizedBox(width: 16),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
+            Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
             const SizedBox(height: 2),
-            Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+            Text(subtitle, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           ])),
           Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey.shade300, size: 18),
         ]),
@@ -243,12 +244,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         height: MediaQuery.of(context).size.height * 0.7,
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24))),
+        decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: const BorderRadius.only(topLeft: Radius.circular(24), topRight: Radius.circular(24))),
         child: Column(children: [
           const SizedBox(height: 12),
           Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
           const SizedBox(height: 20),
-          const Text('Your Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
+          Text('Your Profile', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
           const SizedBox(height: 20),
           Expanded(child: SingleChildScrollView(padding: const EdgeInsets.symmetric(horizontal: 20), child: Column(children: [
             _buildProfileItem(Icons.person_outline, 'Name', _doctor.name),
@@ -268,13 +269,13 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
   Widget _buildProfileItem(IconData icon, String label, String value) {
     return Container(
       width: double.infinity, margin: const EdgeInsets.only(bottom: 10), padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(color: const Color(0xFFF5F9FC), borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(12)),
       child: Row(children: [
-        Icon(icon, color: const Color(0xFF0077B6), size: 20),
+        Icon(icon, color: AppColors.primary, size: 20),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
-          Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
+          Text(label, style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+          Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
         ])),
       ]),
     );
@@ -336,14 +337,14 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
     Color statusColor;
     Color statusBgColor;
     if (appointment.status == 'Approved') {
-      statusColor = const Color(0xFF4CAF50);
-      statusBgColor = const Color(0xFFE8F5E9);
+      statusColor = AppColors.available;
+      statusBgColor = AppColors.availableBg;
     } else if (appointment.status == 'Rejected') {
-      statusColor = const Color(0xFFE53935);
-      statusBgColor = const Color(0xFFFFEBEE);
+      statusColor = AppColors.busy;
+      statusBgColor = AppColors.busyBg;
     } else {
-      statusColor = const Color(0xFFFFB800);
-      statusBgColor = const Color(0xFFFFF8E1);
+      statusColor = AppColors.pending;
+      statusBgColor = AppColors.pendingBg;
     }
 
     return Card(
@@ -374,12 +375,12 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF0077B6).withOpacity(0.15),
+                            color: AppColors.primaryBg,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: const Icon(
                             Icons.person,
-                            color: Color(0xFF0077B6),
+                            color: AppColors.primary,
                             size: 18,
                           ),
                         ),
@@ -390,10 +391,10 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             children: [
                               Text(
                                 appointment.patientName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1A1A2E),
+                                  color: AppColors.textPrimary,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -464,7 +465,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
 
               const SizedBox(height: 8),
 
-              // Date and Contact
+              // Date, Duration, and Contact
               Row(
                 children: [
                   Icon(
@@ -484,7 +485,25 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
+                  Icon(
+                    Icons.timer_outlined,
+                    size: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      appointment.duration,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
                   Icon(
                     Icons.phone,
                     size: 14,
@@ -517,7 +536,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           side: const BorderSide(
-                            color: Color(0xFFE53935),
+                            color: AppColors.busy,
                             width: 1,
                           ),
                           shape: RoundedRectangleBorder(
@@ -530,7 +549,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                             Icon(
                               Icons.close,
                               size: 14,
-                              color: Color(0xFFE53935),
+                              color: AppColors.busy,
                             ),
                             SizedBox(width: 4),
                             Text(
@@ -538,7 +557,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFFE53935),
+                                color: AppColors.busy,
                               ),
                             ),
                           ],
@@ -551,7 +570,7 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
                         onPressed: onApprove,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: AppColors.available,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

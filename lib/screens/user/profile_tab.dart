@@ -1,12 +1,15 @@
 /// ============================================================
 /// Profile Tab - User Profile Management
 /// ============================================================
-/// Displays user profile information and allows editing.
+/// Displays user profile information with premium design.
+/// Uses AppColors — no hardcoded hex values.
 /// ============================================================
 
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
 import '../../data/dummy_data.dart';
+import '../../theme/app_colors.dart';
+import '../../services/theme_service.dart';
 import '../landing_page.dart';
 
 class ProfileTab extends StatefulWidget {
@@ -32,7 +35,6 @@ class _ProfileTabState extends State<ProfileTab> {
     _user = widget.user;
   }
 
-  /// Show edit profile dialog
   void _showEditProfileDialog() {
     final nameController = TextEditingController(text: _user.name);
     final emailController = TextEditingController(text: _user.email);
@@ -41,69 +43,31 @@ class _ProfileTabState extends State<ProfileTab> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
         title: const Text(
           'Edit Profile',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A2E),
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Name field
-              TextField(
+              _buildDialogField(
                 controller: nameController,
-                decoration: InputDecoration(
-                  labelText: 'Full Name',
-                  labelStyle: const TextStyle(color: Color(0xFF0077B6)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.person,
-                    color: Color(0xFF0077B6),
-                  ),
-                ),
+                label: 'Full Name',
+                icon: Icons.person,
               ),
               const SizedBox(height: 12),
-
-              // Email field
-              TextField(
+              _buildDialogField(
                 controller: emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  labelStyle: const TextStyle(color: Color(0xFF0077B6)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.email,
-                    color: Color(0xFF0077B6),
-                  ),
-                ),
+                label: 'Email',
+                icon: Icons.email,
               ),
               const SizedBox(height: 12),
-
-              // Phone field
-              TextField(
+              _buildDialogField(
                 controller: phoneController,
-                decoration: InputDecoration(
-                  labelText: 'Phone Number',
-                  labelStyle: const TextStyle(color: Color(0xFF0077B6)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.phone,
-                    color: Color(0xFF0077B6),
-                  ),
-                  hintText: 'Optional',
-                ),
+                label: 'Phone Number',
+                icon: Icons.phone,
+                hint: 'Optional',
               ),
             ],
           ),
@@ -115,59 +79,67 @@ class _ProfileTabState extends State<ProfileTab> {
           ),
           ElevatedButton(
             onPressed: () {
-              // Update user
               final updatedUser = UserModel(
                 id: _user.id,
                 name: nameController.text,
                 email: emailController.text,
                 password: _user.password,
               );
-
-              setState(() {
-                _user = updatedUser;
-              });
-
+              setState(() => _user = updatedUser);
               widget.onUserUpdated(updatedUser);
-
               Navigator.pop(context);
-
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('✓ Profile updated successfully'),
-                  backgroundColor: Color(0xFF4CAF50),
+                  backgroundColor: AppColors.available,
                   duration: Duration(seconds: 2),
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0077B6),
-            ),
-            child: const Text(
-              'Save',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
 
-  /// Show logout confirmation dialog
+  Widget _buildDialogField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? hint,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        labelStyle: const TextStyle(color: AppColors.primary),
+        floatingLabelStyle: const TextStyle(color: AppColors.primary),
+        prefixIcon: Icon(icon, color: AppColors.primary),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+      ),
+    );
+  }
+
   void _showLogoutDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
         title: const Text(
           'Logout',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A2E),
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: const Text('Are you sure you want to logout?'),
+        content: Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -178,14 +150,12 @@ class _ProfileTabState extends State<ProfileTab> {
               Navigator.pop(context);
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const LandingPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const LandingPage()),
                 (route) => false,
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE53935),
+              backgroundColor: AppColors.busy,
             ),
             child: const Text(
               'Logout',
@@ -200,17 +170,9 @@ class _ProfileTabState extends State<ProfileTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0077B6),
-        elevation: 0,
-        title: const Text(
-          'My Profile',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+        title: const Text('My Profile'),
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
@@ -219,44 +181,42 @@ class _ProfileTabState extends State<ProfileTab> {
             // ---- Profile Header ----
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
               decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF0077B6), Color(0xFF00B4D8)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                gradient: AppColors.primaryGradient,
               ),
               child: Column(
                 children: [
                   // Avatar
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 88,
+                    height: 88,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.2),
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 3,
-                      ),
+                      color: Colors.white.withOpacity(0.20),
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.12),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(
-                        _user.name.isEmpty
-                            ? 'U'
-                            : _user.name[0].toUpperCase(),
+                        _user.name.isEmpty ? 'U' : _user.name[0].toUpperCase(),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 32,
+                          fontSize: 34,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 16),
 
-                  // Name
                   Text(
                     _user.name,
                     style: const TextStyle(
@@ -266,58 +226,187 @@ class _ProfileTabState extends State<ProfileTab> {
                     ),
                   ),
                   const SizedBox(height: 4),
-
-                  // Email
                   Text(
                     _user.email,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.white.withOpacity(0.85),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Stats row
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatItem('${dummyAppointments.length}',
+                            'Total Bookings'),
+                        Container(
+                            width: 1,
+                            height: 30,
+                            color: Colors.white.withOpacity(0.30)),
+                        _buildStatItem(
+                          '${dummyAppointments.where((b) => b.status == 'Approved').length}',
+                          'Approved',
+                        ),
+                        Container(
+                            width: 1,
+                            height: 30,
+                            color: Colors.white.withOpacity(0.30)),
+                        _buildStatItem(
+                          '${dummyAppointments.where((b) => b.status == 'Pending').length}',
+                          'Pending',
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // ---- Profile Information ----
+            // ---- Account Information ----
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Account Information',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A2E),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                      letterSpacing: 0.3,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
 
-                  // Name Info Card
-                  _buildInfoCard(
-                    icon: Icons.person,
-                    label: 'Full Name',
-                    value: _user.name,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        _buildInfoRow(
+                            Icons.person, 'Full Name', _user.name, false),
+                        Divider(height: 1, color: AppColors.divider),
+                        _buildInfoRow(
+                            Icons.email, 'Email', _user.email, false),
+                        Divider(height: 1, color: AppColors.divider),
+                        _buildInfoRow(
+                            Icons.badge, 'User ID', _user.id, true),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ---- Preferences ----
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Preferences',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                   const SizedBox(height: 10),
 
-                  // Email Info Card
-                  _buildInfoCard(
-                    icon: Icons.email,
-                    label: 'Email Address',
-                    value: _user.email,
-                  ),
-                  const SizedBox(height: 10),
-
-                  // ID Info Card
-                  _buildInfoCard(
-                    icon: Icons.badge,
-                    label: 'User ID',
-                    value: _user.id,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.dark_mode_rounded,
+                                  size: 17,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Dark Mode',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Enable premium dark theme',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Switch(
+                            value: ThemeService.instance.isDarkMode,
+                            onChanged: (value) {
+                              setState(() {
+                                ThemeService.instance.toggleTheme(value);
+                              });
+                            },
+                            activeColor: AppColors.primary,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -330,70 +419,70 @@ class _ProfileTabState extends State<ProfileTab> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  // Edit Profile Button
-                  SizedBox(
+                  // Edit Profile Button (gradient)
+                  Container(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _showEditProfileDialog,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0077B6),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    height: 52,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.28),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
-                        elevation: 2,
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit, color: Colors.white),
-                          SizedBox(width: 8),
-                          Text(
-                            'Edit Profile',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: _showEditProfileDialog,
+                        borderRadius: BorderRadius.circular(14),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.edit_outlined,
+                                color: Colors.white, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Edit Profile',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
+
                   const SizedBox(height: 12),
 
                   // Logout Button
                   SizedBox(
                     width: double.infinity,
-                    child: OutlinedButton(
+                    height: 52,
+                    child: OutlinedButton.icon(
                       onPressed: _showLogoutDialog,
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
                         side: const BorderSide(
-                          color: Color(0xFFE53935),
-                          width: 2,
-                        ),
+                            color: AppColors.busy, width: 1.5),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.logout,
-                            color: Color(0xFFE53935),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Logout',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFE53935),
-                            ),
-                          ),
-                        ],
+                      icon: const Icon(Icons.logout_rounded,
+                          color: AppColors.busy, size: 18),
+                      label: const Text(
+                        'Logout',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.busy,
+                        ),
                       ),
                     ),
                   ),
@@ -401,45 +490,51 @@ class _ProfileTabState extends State<ProfileTab> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  /// Build info card
-  Widget _buildInfoCard({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F9FF),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF0077B6).withOpacity(0.2),
-          width: 1,
+  Widget _buildStatItem(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.80),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(
+      IconData icon, String label, String value, bool isLast) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF0077B6).withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.primaryBg,
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: const Color(0xFF0077B6),
-            ),
+            child: Icon(icon, size: 17, color: AppColors.primary),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -448,17 +543,17 @@ class _ProfileTabState extends State<ProfileTab> {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade600,
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A2E),
+                    color: AppColors.textPrimary,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

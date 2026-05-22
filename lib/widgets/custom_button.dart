@@ -1,12 +1,13 @@
 /// ============================================================
 /// Custom Button Widget - Reusable Action Button
 /// ============================================================
-/// A beautifully styled button that can be reused across
-/// all screens. Features: gradient background, rounded corners,
-/// loading state, and elevation.
+/// A premium styled button with gradient background, rounded corners,
+/// loading state, soft shadow, and ripple effect.
+/// Uses AppColors — no hardcoded hex values.
 /// ============================================================
 
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   // Text displayed on the button
@@ -15,8 +16,8 @@ class CustomButton extends StatelessWidget {
   // Function called when button is pressed
   final VoidCallback onPressed;
 
-  // Background color (defaults to primary blue)
-  final Color? backgroundColor;
+  // Custom gradient override (defaults to primary → primaryLight)
+  final List<Color>? gradientColors;
 
   // Text color (defaults to white)
   final Color textColor;
@@ -33,135 +34,128 @@ class CustomButton extends StatelessWidget {
   // Width of the button (null = match parent)
   final double? width;
 
+  // Height of the button
+  final double height;
+
+  // Border radius
+  final double borderRadius;
+
   const CustomButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.backgroundColor,
+    this.gradientColors,
     this.textColor = Colors.white,
     this.isLoading = false,
     this.isOutlined = false,
     this.icon,
     this.width,
+    this.height = 54,
+    this.borderRadius = 14,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Default gradient colors
-    final Color bgColor = backgroundColor ?? const Color(0xFF0077B6);
-
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: SizedBox(
         width: width ?? double.infinity,
-        height: 54,
+        height: height,
         child: isOutlined
-            ? _buildOutlinedButton(bgColor)
-            : _buildFilledButton(bgColor),
+            ? _buildOutlinedButton()
+            : _buildFilledButton(),
       ),
     );
   }
 
-  /// Builds a filled/gradient button
-  Widget _buildFilledButton(Color bgColor) {
+  /// Builds a gradient filled button
+  Widget _buildFilledButton() {
+    final colors = gradientColors ?? [AppColors.primary, AppColors.primaryLight];
+
     return Container(
       decoration: BoxDecoration(
-        // Gradient background for a premium look
         gradient: LinearGradient(
-          colors: [
-            bgColor,
-            bgColor.withOpacity(0.8),
-          ],
+          colors: colors,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(14),
-        // Soft shadow for elevation effect
+        borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: bgColor.withOpacity(0.3),
+            color: colors[0].withOpacity(0.30),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isLoading ? null : onPressed,
+          borderRadius: BorderRadius.circular(borderRadius),
+          splashColor: Colors.white.withOpacity(0.15),
+          highlightColor: Colors.white.withOpacity(0.10),
+          child: Center(child: _buildContent(colors[0])),
         ),
-        child: isLoading
-            ? const SizedBox(
-                height: 22,
-                width: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, color: textColor, size: 20),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    text,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
       ),
     );
   }
 
-  /// Builds an outlined/border button
-  Widget _buildOutlinedButton(Color bgColor) {
-    return OutlinedButton(
-      onPressed: isLoading ? null : onPressed,
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: bgColor, width: 1.5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+  /// Builds an outlined border button
+  Widget _buildOutlinedButton() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: AppColors.primary, width: 1.5),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isLoading ? null : onPressed,
+          borderRadius: BorderRadius.circular(borderRadius),
+          splashColor: AppColors.primary.withOpacity(0.08),
+          highlightColor: AppColors.primary.withOpacity(0.04),
+          child: Center(child: _buildContent(AppColors.primary)),
         ),
       ),
-      child: isLoading
-          ? SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation<Color>(bgColor),
-              ),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (icon != null) ...[
-                  Icon(icon, color: bgColor, size: 20),
-                  const SizedBox(width: 8),
-                ],
-                Text(
-                  text,
-                  style: TextStyle(
-                    color: bgColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
+    );
+  }
+
+  Widget _buildContent(Color color) {
+    if (isLoading) {
+      return SizedBox(
+        height: 22,
+        width: 22,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.5,
+          valueColor: AlwaysStoppedAnimation<Color>(
+            isOutlined ? AppColors.primary : Colors.white,
+          ),
+        ),
+      );
+    }
+
+    final textCol = isOutlined ? AppColors.primary : textColor;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, color: textCol, size: 20),
+          const SizedBox(width: 8),
+        ],
+        Text(
+          text,
+          style: TextStyle(
+            color: textCol,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
     );
   }
 }

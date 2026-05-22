@@ -2,12 +2,13 @@
 /// Notifications Bottom Sheet - Display User Notifications
 /// ============================================================
 /// Shows notifications in a beautiful bottom sheet with mark as read
-/// and clear all features.
+/// and clear all features. Uses AppColors throughout.
 /// ============================================================
 
 import 'package:flutter/material.dart';
 import '../models/notification_model.dart';
 import '../data/dummy_data.dart';
+import '../theme/app_colors.dart';
 
 class NotificationsBottomSheet extends StatefulWidget {
   const NotificationsBottomSheet({super.key});
@@ -44,9 +45,6 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
         title: const Text(
           'Clear All Notifications?',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -66,7 +64,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE53935),
+              backgroundColor: AppColors.busy,
             ),
             child: const Text(
               'Clear All',
@@ -85,9 +83,9 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
         ),
@@ -96,12 +94,12 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
         children: [
           // ---- Top Handle Bar ----
           Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 12),
+            padding: const EdgeInsets.only(top: 12, bottom: 8),
             child: Container(
-              width: 40,
+              width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -109,19 +107,19 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
 
           // ---- Header ----
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.fromLTRB(20, 8, 16, 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Notifications',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1A1A2E),
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     if (unreadCount > 0)
@@ -129,7 +127,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                         '$unreadCount unread',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                   ],
@@ -140,22 +138,33 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                       if (unreadCount > 0)
                         TextButton(
                           onPressed: _markAllAsRead,
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                          ),
                           child: const Text(
                             'Mark all read',
                             style: TextStyle(
-                              color: Color(0xFF0077B6),
-                              fontSize: 12,
+                              color: AppColors.primary,
+                              fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      const SizedBox(width: 4),
                       GestureDetector(
                         onTap: _clearAllNotifications,
-                        child: Icon(
-                          Icons.delete_outline,
-                          color: Colors.grey.shade400,
-                          size: 20,
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            color: AppColors.background,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Icon(
+                            Icons.delete_outline,
+                            color: AppColors.textSecondary,
+                            size: 18,
+                          ),
                         ),
                       ),
                     ],
@@ -164,7 +173,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
             ),
           ),
 
-          const Divider(height: 1),
+          Divider(height: 1, color: AppColors.divider),
 
           // ---- Notifications List ----
           if (userNotifications.isEmpty)
@@ -173,18 +182,34 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.notifications_off_outlined,
-                      size: 48,
-                      color: Colors.grey.shade300,
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Icon(
+                        Icons.notifications_off_outlined,
+                        size: 36,
+                        color: AppColors.textHint,
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     Text(
                       'No notifications',
                       style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade500,
+                        fontSize: 15,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'You\'re all caught up!',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textHint,
                       ),
                     ),
                   ],
@@ -194,7 +219,7 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
           else
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(16),
                 itemCount: userNotifications.length,
                 itemBuilder: (context, index) {
                   final notification = userNotifications[index];
@@ -209,41 +234,45 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
 
   /// Build notification card
   Widget _buildNotificationCard(NotificationModel notification) {
+    final isUnread = !notification.isRead;
+
     return GestureDetector(
       onTap: () => _markAsRead(notification.id),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: notification.isRead
-              ? Colors.grey.shade50
-              : const Color(0xFFF5F9FF),
-          borderRadius: BorderRadius.circular(12),
+          color: isUnread ? AppColors.primaryBg : AppColors.cardBg,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: notification.isRead
-                ? Colors.grey.shade200
-                : const Color(0xFF0077B6).withOpacity(0.3),
+            color: isUnread
+                ? AppColors.primary.withOpacity(0.15)
+                : AppColors.border,
             width: 1,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon
+            // Icon container
             Container(
-              width: 40,
-              height: 40,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
-                color: const Color(0xFF0077B6).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(8),
+                color: AppColors.primary.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
                 child: Text(
                   notification.icon,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 20),
                 ),
               ),
             ),
@@ -256,27 +285,28 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                 children: [
                   // Title with unread indicator
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Text(
                           notification.title,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF1A1A2E),
-                            decoration: notification.isRead
-                                ? TextDecoration.none
-                                : TextDecoration.none,
+                            fontWeight: isUnread
+                                ? FontWeight.w700
+                                : FontWeight.w600,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                       ),
-                      if (!notification.isRead)
+                      if (isUnread)
                         Container(
                           width: 8,
                           height: 8,
+                          margin: const EdgeInsets.only(top: 4, left: 6),
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color(0xFF0077B6),
+                            color: AppColors.busy,
                           ),
                         ),
                     ],
@@ -288,7 +318,8 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                     notification.message,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -300,7 +331,8 @@ class _NotificationsBottomSheetState extends State<NotificationsBottomSheet> {
                     _getTimeAgo(notification.timestamp),
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey.shade500,
+                      color: AppColors.textHint,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

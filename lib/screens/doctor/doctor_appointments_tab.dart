@@ -1,13 +1,15 @@
 /// ============================================================
 /// Doctor Appointments Tab - View & Manage Appointments
 /// ============================================================
-/// Shows appointments for the doctor with approve/reject buttons.
+/// Shows appointments with approve/reject buttons.
+/// Uses AppColors throughout — no hardcoded hex values.
 /// ============================================================
 
 import 'package:flutter/material.dart';
 import '../../models/doctor_model.dart';
 import '../../models/appointment_model.dart';
 import '../../data/dummy_data.dart';
+import '../../theme/app_colors.dart';
 
 class DoctorAppointmentsTab extends StatefulWidget {
   final DoctorModel doctor;
@@ -22,38 +24,28 @@ class DoctorAppointmentsTab extends StatefulWidget {
 }
 
 class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
-  /// Get appointments for this doctor
   List<AppointmentModel> _getDoctorAppointments() {
-    return appointmentBookings
+    return dummyAppointments
         .where((apt) => apt.doctorId == widget.doctor.id)
         .toList();
   }
 
-  /// Update appointment status
   void _updateAppointmentStatus(String appointmentId, String newStatus) {
-    final index = appointmentBookings
-        .indexWhere((apt) => apt.id == appointmentId);
+    final index =
+        dummyAppointments.indexWhere((apt) => apt.id == appointmentId);
     if (index != -1) {
       setState(() {
-        appointmentBookings[index] =
-            appointmentBookings[index].copyWith(status: newStatus);
+        dummyAppointments[index] =
+            dummyAppointments[index].copyWith(status: newStatus);
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            '✓ Appointment ${newStatus.toLowerCase()}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          content: Text('✓ Appointment ${newStatus.toLowerCase()}'),
           backgroundColor: newStatus == 'Approved'
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFE53935),
+              ? AppColors.available
+              : AppColors.busy,
           duration: const Duration(seconds: 2),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.all(16),
         ),
       );
     }
@@ -64,41 +56,13 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
     final appointments = _getDoctorAppointments();
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0077B6),
-        elevation: 0,
-        title: const Text(
-          'Appointments',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
+        title: const Text('Appointments'),
         automaticallyImplyLeading: false,
       ),
       body: appointments.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.calendar_month,
-                    size: 64,
-                    color: Colors.grey.shade300,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No appointments yet',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade500,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            )
+          ? _buildEmptyState()
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: appointments.length,
@@ -110,271 +74,251 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
     );
   }
 
-  /// Build appointment card
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Icon(
+              Icons.calendar_month_outlined,
+              size: 40,
+              color: AppColors.textHint,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No appointments yet',
+            style: TextStyle(
+              fontSize: 16,
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Appointments from patients will appear here',
+            style: TextStyle(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAppointmentCard(AppointmentModel appointment) {
-    // Determine status color
     Color statusColor;
     Color statusBgColor;
     IconData statusIcon;
 
     if (appointment.status == 'Approved') {
-      statusColor = const Color(0xFF4CAF50);
-      statusBgColor = const Color(0xFFE8F5E9);
-      statusIcon = Icons.check_circle;
+      statusColor = AppColors.available;
+      statusBgColor = AppColors.availableBg;
+      statusIcon = Icons.check_circle_rounded;
     } else if (appointment.status == 'Rejected') {
-      statusColor = const Color(0xFFE53935);
-      statusBgColor = const Color(0xFFFFEBEE);
-      statusIcon = Icons.cancel;
+      statusColor = AppColors.busy;
+      statusBgColor = AppColors.busyBg;
+      statusIcon = Icons.cancel_rounded;
     } else {
-      statusColor = const Color(0xFFFFB800);
-      statusBgColor = const Color(0xFFFFF8E1);
-      statusIcon = Icons.schedule;
+      statusColor = AppColors.pending;
+      statusBgColor = AppColors.pendingBg;
+      statusIcon = Icons.schedule_rounded;
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: statusColor.withOpacity(0.3),
-            width: 1.5,
+      decoration: BoxDecoration(
+        color: AppColors.cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ---- Header with Status ----
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        // Patient Icon
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF0077B6).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.person,
-                            color: Color(0xFF0077B6),
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                appointment.patientName,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1A1A2E),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Age: ${appointment.age}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ---- Header with Status ----
+            Row(
+              children: [
+                // Patient Avatar
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBg,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  // Status Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusBgColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: statusColor,
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(statusIcon, size: 11, color: statusColor),
-                        const SizedBox(width: 4),
-                        Text(
-                          appointment.status,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: statusColor,
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: const Icon(
+                    Icons.person_rounded,
+                    color: AppColors.primary,
+                    size: 22,
                   ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-
-              // ---- Symptoms ----
-              Row(
-                children: [
-                  Icon(
-                    Icons.medical_services_outlined,
-                    size: 14,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      appointment.symptoms,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade700,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              // ---- Date and Contact ----
-              Row(
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 12,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      appointment.appointmentDate,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Icon(
-                    Icons.phone,
-                    size: 12,
-                    color: Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      appointment.contactNumber,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // ---- Action Buttons (only for Pending) ----
-              if (appointment.status == 'Pending')
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _updateAppointmentStatus(
-                          appointment.id,
-                          'Rejected',
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          side: const BorderSide(
-                            color: Color(0xFFE53935),
-                            width: 1,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.close, size: 13, color: Color(0xFFE53935)),
-                            SizedBox(width: 4),
-                            Text(
-                              'Reject',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFFE53935),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => _updateAppointmentStatus(
-                          appointment.id,
-                          'Approved',
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          backgroundColor: const Color(0xFF4CAF50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.check, size: 13, color: Colors.white),
-                            SizedBox(width: 4),
-                            Text(
-                              'Approve',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
+                const SizedBox(width: 12),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        appointment.patientName,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        'Age: ${appointment.age}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Status Badge
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: statusBgColor,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(statusIcon, size: 11, color: statusColor),
+                      const SizedBox(width: 4),
+                      Text(
+                        appointment.status,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: statusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+            Divider(height: 1, color: AppColors.divider),
+            const SizedBox(height: 12),
+
+            // ---- Details ----
+            _buildDetailRow(
+                Icons.medical_services_outlined, appointment.symptoms),
+            const SizedBox(height: 6),
+            _buildDetailRow(
+                Icons.calendar_today, appointment.appointmentDate),
+            const SizedBox(height: 6),
+            _buildDetailRow(
+                Icons.timer_outlined, 'Consultation Duration: ${appointment.duration}'),
+            const SizedBox(height: 6),
+            _buildDetailRow(Icons.phone, appointment.contactNumber),
+
+            // ---- Action Buttons (only for Pending) ----
+            if (appointment.status == 'Pending') ...[
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _updateAppointmentStatus(
+                          appointment.id, 'Rejected'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        side: const BorderSide(
+                            color: AppColors.busy, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      icon: const Icon(Icons.close,
+                          size: 14, color: AppColors.busy),
+                      label: const Text(
+                        'Reject',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.busy,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _updateAppointmentStatus(
+                          appointment.id, 'Approved'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        backgroundColor: AppColors.available,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      icon: const Icon(Icons.check,
+                          size: 14, color: Colors.white),
+                      label: const Text(
+                        'Approve',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
-          ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 13, color: AppColors.textSecondary),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }
