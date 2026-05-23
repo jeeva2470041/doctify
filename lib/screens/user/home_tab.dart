@@ -96,7 +96,7 @@ class _HomeTabState extends State<HomeTab> {
             backgroundColor: AppColors.primary,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding:
-                  const EdgeInsets.only(left: 20, bottom: 60, right: 60),
+                  const EdgeInsets.only(left: 20, bottom: 16, right: 60),
               title: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,6 +325,111 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ),
           ),
+
+          // ---- Favorites Horizontal List ----
+          if (widget.user.favoriteDoctorIds.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Favorite Doctors',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 84,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: widget.user.favoriteDoctorIds.length,
+                        itemBuilder: (context, index) {
+                          final docId = widget.user.favoriteDoctorIds[index];
+                          // Find doctor in dummyDoctors
+                          final doctor = dummyDoctors.firstWhere(
+                            (d) => d.id == docId,
+                            orElse: () => dummyDoctors.first,
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 14),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) => DoctorInfoBottomSheet(
+                                    doctor: doctor,
+                                    isFavorite: true,
+                                    onToggleFavorite: widget.onToggleFavorite,
+                                  ),
+                                  isScrollControlled: true,
+                                  useSafeArea: true,
+                                  backgroundColor: Colors.transparent,
+                                );
+                              },
+                              child: Column(
+                                children: [
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: AppColors.primaryGradient,
+                                      border: Border.all(
+                                        color: AppColors.primary.withOpacity(0.3),
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.06),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 2),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        doctor.name.replaceFirst('Dr. ', '').isEmpty
+                                            ? 'D'
+                                            : doctor.name.replaceFirst('Dr. ', '')[0].toUpperCase(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  SizedBox(
+                                    width: 70,
+                                    child: Text(
+                                      doctor.name,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           // ---- Category Chips ----
           SliverToBoxAdapter(

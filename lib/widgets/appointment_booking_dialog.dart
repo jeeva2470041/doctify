@@ -11,6 +11,7 @@ import '../models/doctor_model.dart';
 import '../models/appointment_model.dart';
 import '../data/dummy_data.dart';
 import '../theme/app_colors.dart';
+import '../services/wellness_service.dart';
 
 class AppointmentBookingDialog extends StatefulWidget {
   final DoctorModel doctor;
@@ -41,6 +42,7 @@ class _AppointmentBookingDialogState extends State<AppointmentBookingDialog> {
   DateTime _selectedDate = DateTime.now();
   String _selectedDuration = '30 Mins';
   String _selectedTimeSlot = '10:00 AM';
+  bool _attachVitals = false;
 
   // Suffix lists for time categorization
   final List<String> _morningSlots = ['09:00 AM', '10:00 AM', '11:00 AM'];
@@ -162,6 +164,11 @@ class _AppointmentBookingDialogState extends State<AppointmentBookingDialog> {
         doctorSpecialization: widget.doctor.specialization,
         duration: _selectedDuration,
         status: 'Pending',
+        attachVitals: _attachVitals,
+        heartRateLog: _attachVitals ? WellnessService.instance.heartRateLog : null,
+        waterLog: _attachVitals ? WellnessService.instance.waterLog : null,
+        sleepLog: _attachVitals ? WellnessService.instance.sleepLog : null,
+        medsLog: _attachVitals ? WellnessService.instance.medsLog : null,
       );
 
       dummyAppointments.add(appointment);
@@ -323,6 +330,80 @@ class _AppointmentBookingDialogState extends State<AppointmentBookingDialog> {
                         validator: (v) => (v == null || v.isEmpty)
                             ? 'Please describe symptoms'
                             : null,
+                      ),
+                      const SizedBox(height: 12),
+                      
+                      // ---- Novelty Feature: Vitals Sharing Toggle Card ----
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _attachVitals ? AppColors.primary : AppColors.border,
+                            width: _attachVitals ? 1.5 : 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.monitor_heart_rounded,
+                                  color: _attachVitals ? AppColors.primary : AppColors.textSecondary,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Attach Wellness Vitals',
+                                        style: TextStyle(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Share heart rate, water, sleep & pill logs',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: AppColors.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Switch.adaptive(
+                                  value: _attachVitals,
+                                  activeColor: AppColors.primary,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      _attachVitals = val;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            if (_attachVitals) ...[
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 8),
+                                child: Divider(height: 1, thickness: 1),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  _buildVitalBadge(Icons.favorite, AppColors.busy, WellnessService.instance.heartRateLog),
+                                  _buildVitalBadge(Icons.water_drop, Colors.blue, WellnessService.instance.waterLog),
+                                  _buildVitalBadge(Icons.bedtime, Colors.indigo, WellnessService.instance.sleepLog),
+                                ],
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 16),
@@ -727,6 +808,31 @@ class _AppointmentBookingDialogState extends State<AppointmentBookingDialog> {
           borderSide: const BorderSide(color: AppColors.busy, width: 1.5),
         ),
         contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+      ),
+    );
+  }
+
+  Widget _buildVitalBadge(IconData icon, Color color, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 12),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }

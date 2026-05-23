@@ -1,18 +1,12 @@
-/// ============================================================
-/// User Home Layout - Main navigation with Bottom Navigation Bar
-/// ============================================================
-/// Main layout for logged-in users with 3 tabs:
-/// Home, My Bookings, Profile
-/// ============================================================
-
 import 'package:flutter/material.dart';
 import '../../models/user_model.dart';
 import '../../theme/app_colors.dart';
+import '../../widgets/sos_button.dart';
 import 'home_tab.dart';
 import 'my_bookings_tab.dart';
-import 'favorites_tab.dart';
 import 'profile_tab.dart';
 import 'ai_assistant_tab.dart';
+import 'reminder_tab.dart';
 
 class UserHomeLayout extends StatefulWidget {
   final UserModel user;
@@ -71,10 +65,7 @@ class _UserHomeLayoutState extends State<UserHomeLayout> {
       ),
       AiAssistantTab(user: _user),
       MyBookingsTab(user: _user),
-      FavoritesTab(
-        user: _user,
-        onToggleFavorite: _toggleFavorite,
-      ),
+      const ReminderTab(),
       ProfileTab(
         user: _user,
         onUserUpdated: _updateUserProfile,
@@ -82,7 +73,17 @@ class _UserHomeLayoutState extends State<UserHomeLayout> {
     ];
 
     return Scaffold(
-      body: screens[_selectedIndex],
+      body: Stack(
+        children: [
+          screens[_selectedIndex],
+          // Floating SOS button overlay (always visible & animated)
+          Positioned(
+            right: 16,
+            bottom: 100,
+            child: const SosButton(),
+          ),
+        ],
+      ),
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
@@ -136,9 +137,9 @@ class _UserHomeLayoutState extends State<UserHomeLayout> {
               label: 'Bookings',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_outline_rounded),
-              activeIcon: Icon(Icons.favorite_rounded),
-              label: 'Favorites',
+              icon: Icon(Icons.medication_outlined),
+              activeIcon: Icon(Icons.medication_rounded),
+              label: 'Reminder',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline_rounded),

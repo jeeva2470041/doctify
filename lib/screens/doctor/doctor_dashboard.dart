@@ -526,6 +526,46 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
 
               const SizedBox(height: 12),
 
+              // ---- Vitals Badge (if shared) ----
+              if (appointment.attachVitals) ...[
+                GestureDetector(
+                  onTap: () => _showVitalsModal(context, appointment),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryBg,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.2), width: 1),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.monitor_heart_outlined, color: AppColors.primary, size: 16),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Vitals Attached (Heart, Water, Sleep, Meds)',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
+                        const Text(
+                          'View Report ➔',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
+
               // Action Buttons (only for Pending)
               if (appointment.status == 'Pending')
                 Row(
@@ -602,6 +642,149 @@ class _DoctorDashboardState extends State<DoctorDashboard> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showVitalsModal(BuildContext context, AppointmentModel appointment) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: AppColors.cardBg,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.monitor_heart_rounded, color: AppColors.primary, size: 24),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Shared Patient Vitals',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Patient: ${appointment.patientName} (Age: ${appointment.age})",
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Vitals Grid
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildVitalCard(
+                      'Heart Rate',
+                      appointment.heartRateLog ?? 'N/A',
+                      Icons.favorite_rounded,
+                      AppColors.busy,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildVitalCard(
+                      'Water Intake',
+                      appointment.waterLog ?? 'N/A',
+                      Icons.water_drop_rounded,
+                      Colors.blue,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildVitalCard(
+                      'Sleep Hours',
+                      appointment.sleepLog ?? 'N/A',
+                      Icons.bedtime_rounded,
+                      Colors.indigo,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildVitalCard(
+                      'Meds Taken',
+                      appointment.medsLog ?? 'N/A',
+                      Icons.medication_rounded,
+                      AppColors.available,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildVitalCard(String title, String value, IconData icon, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              Icon(icon, color: color, size: 16),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }

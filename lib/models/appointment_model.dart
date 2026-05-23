@@ -40,6 +40,13 @@ class AppointmentModel {
   // Possible values: 'Pending', 'Approved', 'Rejected'
   final String status;
 
+  // Vitals sharing fields
+  final bool attachVitals;
+  final String? heartRateLog;
+  final String? waterLog;
+  final String? sleepLog;
+  final String? medsLog;
+
   /// Constructor with named parameters
   AppointmentModel({
     required this.id,
@@ -53,6 +60,11 @@ class AppointmentModel {
     this.doctorSpecialization = 'General Physician',
     this.duration = '30 Mins',
     this.status = 'Pending',
+    this.attachVitals = false,
+    this.heartRateLog,
+    this.waterLog,
+    this.sleepLog,
+    this.medsLog,
   });
 
   /// Creates a copy with updated fields
@@ -68,6 +80,11 @@ class AppointmentModel {
     String? doctorSpecialization,
     String? duration,
     String? status,
+    bool? attachVitals,
+    String? heartRateLog,
+    String? waterLog,
+    String? sleepLog,
+    String? medsLog,
   }) {
     return AppointmentModel(
       id: id ?? this.id,
@@ -81,6 +98,11 @@ class AppointmentModel {
       doctorSpecialization: doctorSpecialization ?? this.doctorSpecialization,
       duration: duration ?? this.duration,
       status: status ?? this.status,
+      attachVitals: attachVitals ?? this.attachVitals,
+      heartRateLog: heartRateLog ?? this.heartRateLog,
+      waterLog: waterLog ?? this.waterLog,
+      sleepLog: sleepLog ?? this.sleepLog,
+      medsLog: medsLog ?? this.medsLog,
     );
   }
 
@@ -98,6 +120,11 @@ class AppointmentModel {
       'doctorSpecialization': doctorSpecialization,
       'duration': duration,
       'status': status,
+      'attachVitals': attachVitals,
+      'heartRateLog': heartRateLog,
+      'waterLog': waterLog,
+      'sleepLog': sleepLog,
+      'medsLog': medsLog,
     };
   }
 
@@ -115,6 +142,11 @@ class AppointmentModel {
       doctorSpecialization: map['doctorSpecialization'] ?? 'General Physician',
       duration: map['duration'] ?? '30 Mins',
       status: map['status'] ?? 'Pending',
+      attachVitals: map['attachVitals'] ?? false,
+      heartRateLog: map['heartRateLog'],
+      waterLog: map['waterLog'],
+      sleepLog: map['sleepLog'],
+      medsLog: map['medsLog'],
     );
   }
 }
